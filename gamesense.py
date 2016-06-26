@@ -51,17 +51,11 @@ class GameSenseAPIException(Exception):
 		super(GameSenseAPIException, self).__init__(message)
 
 class GameSense(object):
-	def __init__(self, game, game_display_name, icon):
+	def __init__(self, game, game_display_name):
 		super(GameSense, self).__init__()
 		self.__address = self.__find_gamesense_data()
 		self.game = game
 		self.game_display_name = game_display_name
-
-		if isinstance(icon, int):
-			self.icon = icon
-		else:
-			self.icon = GS_ICON_ORANGE
-
 
 	def __find_gamesense_data(self):
 		platform = os.name
@@ -72,40 +66,43 @@ class GameSense(object):
 		elif platform == "mac":
 			prop_path = os.path.expandvars(GS_CORE_PROPS_OSX)
 		else:
-			# XXX Raise Unsupported platform
-			return ""
+			raise GameSenseNotPresentException("GameSense is not supported on platform '{}'".format(platform))
 
 		if os.path.isfile(prop_path):
-			# XXX wrap this in a try/except in case file reading or json parsing fails
-			prop_data = json.loads(open(prop_path).read())
+			prop_file = None
+
+			try:
+				prop_file = open(prop_path)
+			except OSError as e:
+				raise GameSenseNotPresentException("Could not open GameSense properties file")
+
+			prop_data = json.loads(prop_file.read())
 			unsecure_address = "http://{address}".format(address=prop_data["address"])
 			return unsecure_address
 		else:
-			# XXX Raise FileNotFound or something
-			return ""
+			raise GameSenseNotPresentException("GameSense properties file missing")
 		
 	def create_message(self, endpoint):
 		message = GameSenseMessage(self.game, endpoint)
 		message["game"] = self.game
 		return message
 
-	def gamesense_post(self, message):
+	def post(self, message):
 		url = "{address}{endpoint}".format(address=self.__address, endpoint=message.endpoint)
 
 		if "game" not in message:
 			raise KeyError("Mandatory key 'game' missing")
 
-		data = requests.post(url, json=message.message_data)
+		api_response = requests.post(url, json=message.message_data)
+		response = GameSenseResponse(success=api_response.status_code == 200, data=api_response.json())
+		return response
 
-		# XXX wrap this in a proper response type
-		return data
-
-	def register_game(self):
+	def register_game(self, icon_color_id=GS_ICON_ORANGE):
 		message = self.create_message(GS_ENDPOINT_GAME_METADATA)
 		message["game"] = self.game
 		message["game_display_name"] = self.game_display_name
-		message["icon_color_id"] = self.icon
-		return self.gamesense_post(message)
+		message["icon_color_id"] = icon_color_id
+		return self.post(message)
 
 	def register_event(self, event_name, min_value=0, max_value=100, icon_id=GS_ICON_ORANGE):
 		message = self.create_message(GS_ENDPOINT_REGISTER_EVENT)
@@ -113,13 +110,13 @@ class GameSense(object):
 		message["min_value"] = min_value
 		message["max_value"] = max_value
 		message["icon_id"] = icon_id
-		return self.gamesense_post(message)
+		return self.post(message)
 
 	def send_event(self, event_name, data):
 		message = self.create_message(GS_ENDPOINT_GAME_EVENT)
 		message["event"] = event_name
 		message["data"] = data
-		return self.gamesense_post(message)
+		return self.post(message)
 
 class GameSenseMessage(object):
 	def __init__(self, game, endpoint):
@@ -143,11 +140,23 @@ class GameSenseMessage(object):
 	def __repr__(self):
 		return "ENDPOINT: {endpoint}, DATA: {data}".format(endpoint=self.endpoint, data=json.dumps(self.__data))
 
+class GameSenseResponse(object):
+	def __init__(self, success, data):
+		super(GameSenseResponse, self).__init__()
+		self.success = success
+		self.data = data
+
 def main():
-	gs = GameSense("PYTHON_SDK", "Python SDK", GS_ICON_GOLD)
-	gs.register_game()
-	print(gs.register_event("DID_STUFF").json())
-	print(gs.send_event("DID_STUFF", {"value": 22}).json())
+	gs = GameSense("PYTHON_SDK", "Python SDK")
+	gs.register_game(GS_ICON_GOLD)
+
+	response = gs.register_event("DID_STUFF")
+	if response.success:
+		print(response.data)
+
+	response = gs.send_event("DID_STUFF", {"value": 22})
+	if response.success:
+		print(response.data)
 
 if __name__ == '__main__':
 	main()
