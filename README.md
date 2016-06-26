@@ -5,7 +5,25 @@ A Python SDK for use with SteelSeries GameSense 3.8.X+
 The only remote dependency is requests. Install that with pip.
 
 ## Usage
-Relatively simple to use. See the main method for the example at the moment. A more thorough example will be broken out later.
+Relatively simple to use.
+
+```python
+# Create a GameSense object instance to use
+gs = GameSense("PYTHON_SDK", "Python SDK")
+
+# Before you can register or send events, you must register your game
+gs.register_game(icon_color_id=GS_ICON_GOLD)
+
+# Register an event (different than binding an event, see more info in the SteelSeries docs)
+gs.register_event("DID_STUFF")
+
+# Test out the event by sending the event
+gs.send_event("DID_STUFF", {"value": 22})
+```
+
+## Todo (at the moment)
+* Support more of the endpoints with nice API wrappers for minimal interaction/message building (main endpoint being `/bind_game_event`)
+* Cleanup the constants declared in the module
 
 ## License
 MIT License
