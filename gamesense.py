@@ -148,7 +148,7 @@ class GameSenseResponse(object):
 
 def main():
 	gs = GameSense("PYTHON_SDK", "Python SDK")
-	gs.register_game(GS_ICON_GOLD)
+	gs.register_game(icon_color_id=GS_ICON_GOLD)
 
 	response = gs.register_event("DID_STUFF")
 	if response.success:
