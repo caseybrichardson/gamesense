@@ -4,8 +4,10 @@ with open("README.md", "r") as fh:
     long_description = fh.read()
 
 setuptools.setup(
+    name="gamesense",
     version="0.0.1",
     author="Casey Richardson",
+    author_email="caseybrichardson@icloud.com",
     description="Library for interacting with SteelSeries GameSense 3.8.x",
     long_description=long_description,
     long_description_content_type="text/markdown",
