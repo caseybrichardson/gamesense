@@ -1,8 +1,6 @@
 import requests
 import json
 import os
-import time
-import random
 
 # URL DECLARATIONS
 GS_CORE_PROPS_WINDOWS = "%ProgramData%\SteelSeries\SteelSeries Engine 3\coreProps.json"
