@@ -13,6 +13,10 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/caseybrichardson/gamesense",
     packages=setuptools.find_packages(),
+    extras_require={
+        "sync": ["requests"],
+        "async": ["aiohttp"]
+    },
     classifiers=[
         "Programming Language :: Python :: 3",
         "License :: OSI Approved :: MIT License",
