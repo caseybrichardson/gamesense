@@ -13,7 +13,7 @@ import random
 
 from pygame.locals import *
 
-from gamesense import gamesense
+import gamesense
 
 FPS = 5
 pygame.init()

@@ -1,1 +1,1 @@
-name = 'gamesense'
+from .gamesense import *
