@@ -252,7 +252,7 @@ if async_enabled:
 
         async def post(self, endpoint, data):
             url = f'{self._address}{endpoint}'
-            async with self.session.post(url, data=data) as resp:
+            async with self.session.post(url, json=data) as resp:
                 t = await resp.text()
                 resp_json = json.loads(t)  # Wrong content type being returned by GameSense API, manually deserialize
                 response = GameSenseResponse(status_code=resp.status, data=resp_json)
