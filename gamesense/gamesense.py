@@ -1,6 +1,7 @@
 
 import json
 import os
+import platform
 
 try:
     import requests
@@ -88,11 +89,11 @@ class GameSenseAPIException(Exception):
 
 
 def gamesense_url():
-    platform = os.name
+    plat = platform.system()
 
-    if platform == "nt":
+    if plat == "Windows":
         prop_path = os.path.expandvars(GS_CORE_PROPS_WINDOWS)
-    elif platform == "mac":
+    elif plat == "Darwin":
         prop_path = os.path.expandvars(GS_CORE_PROPS_OSX)
     else:
         raise GameSenseNotPresentException("GameSense is not supported on platform '{}'".format(platform))
