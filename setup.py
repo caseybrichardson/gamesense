@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="gamesense",
-    version="0.0.4",
+    version="0.0.5",
     author="Casey Richardson",
     author_email="caseybrichardson@icloud.com",
     description="Library for interacting with SteelSeries GameSense 3.8.x",
